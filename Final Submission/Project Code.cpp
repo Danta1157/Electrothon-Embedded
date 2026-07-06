@@ -142,8 +142,10 @@ void loop() {
   }
 
   // 2. Flush offline logs if Wi-Fi is back
-  flushQueue();
-
+  if (WiFi.status() == WL_CONNECTED && front > 0) {
+    flushQueue();
+  }
+  
   // 3. Keypad Processing
   char key = keypad.getKey();
   if (current_state != EMERGENCY) {
@@ -330,7 +332,7 @@ void saveLogOffline(const char* id, String role, String timestamp) {
   } 
   
   else {
-    Serial.println(Offline queue is full!");
+    Serial.println("Offline queue is full!");
   }
 }
 
@@ -363,7 +365,6 @@ void sendToCloud(const char* id, String role, String timestamp) {
 
 
 void flushQueue() {
-  if (WiFi.status() == WL_CONNECTED && front > 0) {
     Serial.println("Connection detected! Flushing queue...");
     
     while (front > 0) {
@@ -373,6 +374,6 @@ void flushQueue() {
       
       sendToCloud(savedId, savedRole, savedTime);
     }
+    
     Serial.println("Queue flushed.");
-  }
 }
